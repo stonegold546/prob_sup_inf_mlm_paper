@@ -65,6 +65,11 @@ results <- runSimulation(
 
 #-------------------------------------------------------------------
 
+list.of.packages <- c("ggplot2", "ggforce", "scales", "patchwork", "data.table")
+new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
+if(length(new.packages)) install.packages(new.packages)
+rm(list.of.packages, new.packages)
+
 library(ggplot2)
 library(ggforce)
 library(scales)
