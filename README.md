@@ -1,4 +1,4 @@
-# prob_sup_inf_mlm_paper
+# Prob-Sup for clustered data
 
 The ps_functions_new.R file is always required as it contains the functions for different estimation/inference techniques.
 
