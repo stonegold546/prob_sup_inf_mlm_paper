@@ -1,3 +1,9 @@
+# Install required packages
+list.of.packages <- c("sandwich", "sandwich", "lmtest", "boot", "lmerTest")
+new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
+if(length(new.packages)) install.packages(new.packages)
+rm(list.of.packages, new.packages)
+
 source("ps_functions_new.R")
 
 # Hypothetical Ruscio
@@ -122,30 +128,4 @@ round(ps.logit.crve <- inf.ps.logit.crve(dat, int = .95), 3)
 # placement scores mlm approach
 round(ps.pl.cl <- inf.ps.pl.mlm(dat, int = .95), 3)
 # [1] 0.615 0.579 0.650
-
-
-# Not part of example ----
-
-library(fitdistrplus)
-# One could use these estimates in a simulation
-fitdist((dat$y[dat$x == 0] + 5) / 30, dbeta)
-# shape1 1.811231 0.04073575
-# shape2 1.445011 0.03146809
-fitdist((dat$y[dat$x == 1] + 5) / 30, dbeta)
-# shape1 2.510751 0.05895978
-# shape2 1.396141 0.03041828
-
-
-plgtnrm <- function (q, mu, scale) pnorm(qlogis(q), mu, scale)
-dlgtnrm <- function (x, mu, scale) {
-  dnorm(qlogis(x), mu, scale) * (1 / (x * (1 - x)))
-}
-
-fitdist((dat$y[dat$x == 0] + 5) / 30, dlgtnrm, start = list(mu = 0, scale = 1))
-# mu    0.3094311 0.02276241
-# scale 1.3736886 0.01609479
-fitdist((dat$y[dat$x == 1] + 5) / 30, dlgtnrm, start = list(mu = 0, scale = 1))
-# mu    0.773806 0.02182698
-# scale 1.299210 0.01543468
-
 
