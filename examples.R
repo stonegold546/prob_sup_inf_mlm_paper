@@ -6,7 +6,7 @@ rm(list.of.packages, new.packages)
 
 source("ps_functions_new.R")
 
-# Hypothetical Ruscio
+# Hypothetical Ruscio example ----
 
 x <- c(6, 7, 8, 7, 9, 6, 5, 4, 7, 8, 7, 6, 9, 5, 4)
 y <- c(4, 3, 5, 3, 6, 2, 2, 1, 6, 7, 4, 3, 2, 4, 3)
@@ -24,7 +24,7 @@ inf.ps.logit(length(x) + length(y), ps(x, y))
 rm(x, y)
 gc()
 
-# CRT
+# CRT example ----
 
 dat <- read.csv("ToolsK_archive.csv")
 # outcome must be named y
@@ -82,7 +82,7 @@ round(ps.pl.cl <- inf.ps.pl.mlm(dat, int = .95), 3)
 # [1] 0.538 0.434 0.638
 
 
-# HSB
+# HSB example ----
 
 hsb <- merTools::hsb
 
@@ -128,4 +128,36 @@ round(ps.logit.crve <- inf.ps.logit.crve(dat, int = .95), 3)
 # placement scores mlm approach
 round(ps.pl.cl <- inf.ps.pl.mlm(dat, int = .95), 3)
 # [1] 0.615 0.579 0.650
+
+
+# Ordinal example 4.2 in Zou paper, not included in manuscript ----
+
+# Needs haven package to import Stata dataset
+# install.packages("haven")
+
+dat <- haven::read_dta("share.dta")
+head(dat <- dat[dat$sex == 2, ])
+table(dat$school)
+table(dat$school, dat$arm)
+head(dat)
+
+table(dat$y <- dat$kscore)
+dat$ID <- dat$school
+table(dat$x <- dat$arm)
+
+par(mfrow = c(1, 2))
+barplot(table(dat$y[dat$x == 0]), ylim = c(0, 400))
+barplot(table(dat$y[dat$x == 1]), ylim = c(0, 400))
+
+dat <- na.omit(dat[, c("ID", "x", "y")])
+length(table(dat$ID))
+table(dat$x)
+ps(dat$y[dat$x == 1], dat$y[dat$x == 0])
+round(inf.ps.pl.mlm(dat), 3)
+# [1] 0.558 0.509 0.605
+# One can only re-create Zou's results if using Walz-z intervals, see ps_functions_new file:
+# [1] 0.558 0.512 0.603
+round(inf.ps.logit.crve(dat), 3)
+# [1] 0.555 0.506 0.603
+
 

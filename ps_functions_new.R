@@ -46,8 +46,8 @@ inf.ps.logit.crve <- function(d, int = .95) {
   params <- unname(lmtest::coeftest(
     glm(cbind(pass, n - pass) ~ 1, quasibinomial, d.long), vcov. = sandwich::vcovCL,
     type = "HC3", cluster = d.long[, c("id1.v", "id0.v")])[, 1:2])
-  plogis(
-    params[1] + qt(c(.5, (1 - int) / 2, int + (1 - int) / 2), n.id - 2) * params[2])
+  crit <- qt(c(.5, (1 - int) / 2, int + (1 - int) / 2), n.id - 2)
+  plogis(params[1] + crit * params[2])
 }
 
 inf.ps.pl.mlm <- function (d, int = .95) {
@@ -67,7 +67,12 @@ inf.ps.pl.mlm <- function (d, int = .95) {
   params <- coef(summary(fit.pl))["x", 1:3]
   est <- unname((params[1] + 1) / 2)
   se <- params[2]
-  lims <- 2 * asinh(qt(c((1 - int) / 2, int + (1 - int) / 2), n.id - 2) / 2 * se / (est * (1 - est)))
+  # Wald-z used in ordinal outcomes example 4.2 hence the differing results
+  # If wanting replicate Zou's results in example:
+  # => uncomment next line and comment out the t-intervals two lines down
+  # crit <- qnorm(c((1 - int) / 2, int + (1 - int) / 2))
+  crit <- qt(c((1 - int) / 2, int + (1 - int) / 2), n.id - 2)
+  lims <- 2 * asinh(crit / 2 * se / (est * (1 - est)))
   c(est, plogis(qlogis(est) + lims))
 }
 
