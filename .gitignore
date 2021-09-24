@@ -1,0 +1,14 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+*.rds
+prob_sub_inf*
+.vscode/
+data/
+test*
+trash*
+try*
+*.Rproj
+*.bib
+play_ground*
