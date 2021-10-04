@@ -24,18 +24,18 @@ calc_pop_ps(.5, .8, .75, 1)
 pnorm((qlogis(.8) - qlogis(.5)) / sqrt(.75 ^ 2 + 1))
 (Design <- rbind(
   expand.grid(
-    n1 = 10, p = c(1 / 3, .5), icc = c(.05, .2), n2 = 3e1,
+    n1 = 10, p = c(1 / 3, .5), icc = c(.05, .2, .5), n2 = 30,
     mu1 = .7, mu2 = c(.7, .8), sg1 = 1, sg2 = c(1, 1.5)),
   expand.grid(
-    n1 = 10, p = c(1 / 3, .5), icc = c(.05, .2), n2 = 3e1,
-    mu1 = .5, mu2 = .8, sg1 = .75, sg2 = 1),
-  expand.grid(
-    n1 = 30, p = 1 / 3, icc = .2, n2 = 3e1,
-    mu1 = .5, mu2 = .8, sg1 = .75, sg2 = 1),
-  expand.grid(
-    n1 = 10, p = 1 / 3, icc = .2, n2 = 5e1,
+    n1 = 10, p = c(1 / 3, .5), icc = c(.05, .2, .5), n2 = 30,
     mu1 = .5, mu2 = .8, sg1 = .75, sg2 = 1)))
-Design <- Design[c(1:4, 9:nrow(Design)), ]
+# expand.grid(
+#   n1 = 30, p = 1 / 3, icc = .2, n2 = 30,
+#   mu1 = .5, mu2 = .8, sg1 = .75, sg2 = 1),
+# expand.grid(
+#   n1 = 10, p = 1 / 3, icc = .2, n2 = 5e1,
+#   mu1 = .5, mu2 = .8, sg1 = .75, sg2 = 1)
+Design <- Design[c(1:6, 13:nrow(Design)), ]
 Design
 # (condition <- list(
 #   pop = pop, n1 = 100, p = 1 / 3, icc = .2, n2 = 100,
@@ -80,7 +80,7 @@ Summarise <- function(condition, results, fixed_objects = NULL) {
 
 #-------------------------------------------------------------------
 
-unlink("SimDesign-results_pop-os_1", recursive = TRUE)
+# unlink("SimDesign-results_pop-os_1", recursive = TRUE)
 results <- runSimulation(
   design = Design, replications = 4e3, generate = Generate,
   analyse = Analyse, summarise = Summarise, seed = rep(123, nrow(Design)),
@@ -114,20 +114,12 @@ cbbPalette <- c("#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2"
 
 (Design <- rbind(
   expand.grid(
-    n1 = 10, p = c(1 / 3, .5), icc = c(.05, .2), n2 = 3e1,
+    n1 = 10, p = c(1 / 3, .5), icc = c(.05, .2, .5), n2 = 30,
     mu1 = .7, mu2 = c(.7, .8), sg1 = 1, sg2 = c(1, 1.5)),
   expand.grid(
-    n1 = 10, p = c(1 / 3, .5), icc = c(.05, .2), n2 = 3e1,
-    mu1 = .5, mu2 = .8, sg1 = .75, sg2 = 1),
-  expand.grid(
-    n1 = 30, p = 1 / 3, icc = .2, n2 = 3e1,
-    mu1 = .5, mu2 = .8, sg1 = .75, sg2 = 1),
-  expand.grid(
-    n1 = 10, p = 1 / 3, icc = .2, n2 = 5e1,
+    n1 = 10, p = c(1 / 3, .5), icc = c(.05, .2, .5), n2 = 30,
     mu1 = .5, mu2 = .8, sg1 = .75, sg2 = 1)))
-Design <- Design[c(1:4, 9:nrow(Design)), ]
-Design
-Design <- Design[1:16, ]
+Design <- Design[c(1:6, 13:nrow(Design)), ]
 Design
 Design$design <- 1:nrow(Design)
 Design$pop <- sapply(
@@ -150,7 +142,7 @@ raw.l
 
 raw.l[, design := as.integer(gsub("[A-Z]+|[a-z]+|\\.|\\-", "", design))]
 raw.l <- raw.l[order(design)]
-raw.l <- raw.l[design <= 16]
+# raw.l <- raw.l[design <= 16]
 raw.l
 
 sum.dat.0 <- raw.l[
@@ -161,7 +153,7 @@ sum.dat.0 <- raw.l[
 sum.dat.0 <- merge(sum.dat.0, Design)
 sum.dat.0
 
-sum.dat.0[, Data := ((design - 1) %/% 4) + 1]
+sum.dat.0[, Data := ((design - 1) %/% 6) + 1]
 sum.dat.0 <- sum.dat.0[order(time)]
 sum.dat.0
 
@@ -171,11 +163,11 @@ A <- ggplot(sum.dat.0, aes(design, mean - pop, col = time.t)) +
   geom_linerange(aes(ymin = q05 - pop, ymax = q95 - pop), position = dodge) +
   # geom_segment(aes(y = pop, yend = pop, x = design - .5, xend = design + .5), linetype = 2, col = 1) +
   geom_hline(yintercept = 0, linetype = 2, col = 1) +
-  geom_vline(xintercept = seq(4.5, 16, 4), alpha = .5) +
+  geom_vline(xintercept = seq(6.5, 24, 6), alpha = .5) +
   scale_x_continuous(breaks = 1:nrow(Design), trans = reverse_trans(), limits = c(nrow(Design) + .5, .5),
                      labels = paste0("Data #", sum.dat.0$Data,
                                      ", ICC:", percent(sum.dat.0$icc),
-                                     ", P:", percent(sum.dat.0$p))[1:16]) +
+                                     ", P:", percent(sum.dat.0$p))[1:24]) +
   scale_y_continuous(labels = percent_format(1)) +
   scale_color_manual(values = cbbPalette[-1]) +
   scale_shape_manual(values = c(1, 2, 4)) +
@@ -184,7 +176,7 @@ A <- ggplot(sum.dat.0, aes(design, mean - pop, col = time.t)) +
        tag = "A", col = "", shape = "") +
   theme(legend.position = "bottom",
         panel.grid.minor.x = element_blank(), panel.grid.major.y = element_blank()) +
-  coord_flip(xlim = c(15.75, 1.25))
+  coord_flip(xlim = c(23.75, 1.25))
 A
 
 sum.dat.1 <- raw.l[, .(mean = mean(coverage), count = .N), list(design, time, time.t)]
@@ -207,7 +199,7 @@ B <- ggplot(sum.dat.1, aes(design, mean, col = time.t)) +
   geom_hline(aes(yintercept = exp), linetype = 2, alpha = .5) +
   geom_hline(aes(yintercept = ll), linetype = 2, col = "#CC6666") +
   geom_hline(aes(yintercept = ul), linetype = 2, col = "#CC6666") +
-  geom_vline(xintercept = seq(4.5, 16, 4), alpha = .5) +
+  geom_vline(xintercept = seq(6.5, 24, 6), alpha = .5) +
   scale_x_continuous(breaks = 1:nrow(Design), trans = reverse_trans()) +
   scale_y_continuous(labels = percent_format(1), breaks = seq(0, 1, .05),
                      sec.axis = sec_axis(trans = ~ ., labels = percent_format(),
@@ -219,10 +211,10 @@ B <- ggplot(sum.dat.1, aes(design, mean, col = time.t)) +
         axis.ticks.x = element_blank(),
         axis.line.y = element_blank(), axis.ticks.y = element_blank(),
         panel.grid.major.y = element_blank()) +
-  coord_flip(xlim = c(15.75, 1.25))
+  coord_flip(xlim = c(23.75, 1.25))
 B
 A + B + plot_layout(widths = c(2, 1))
-ggsave("plots_1b_beta.png", width = 6.5, height = 6)
+ggsave("plots_1b_beta.png", width = 6.5, height = 7)
 
 (Des.dt <- as.data.table(Design))
 (Des.dt <- Des.dt[, .N, list(mu1, mu2, sg1, sg2, pop)])
