@@ -116,9 +116,6 @@ round(ps.pl.cl <- inf.ps.pl.mlm(dat, int = .95), 3)
 
 # Ordinal example 4.2 in Zou paper, not included in manuscript ----
 
-# Needs haven package to import Stata dataset
-# install.packages("haven")
-
 dat <- haven::read_dta("share.dta")
 head(dat <- dat[dat$sex == 2, ])
 table(dat$school)
