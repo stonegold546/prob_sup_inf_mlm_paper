@@ -1,35 +1,19 @@
 # Install required packages
-list.of.packages <- c("sandwich", "sandwich", "lmtest", "boot", "lmerTest")
+list.of.packages <- c("sandwich", "sandwich", "lmtest", "boot", "lmerTest", "haven")
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 if(length(new.packages)) install.packages(new.packages)
 rm(list.of.packages, new.packages)
 
 source("ps_functions_new.R")
 
-# Hypothetical Ruscio example ----
-
-x <- c(6, 7, 8, 7, 9, 6, 5, 4, 7, 8, 7, 6, 9, 5, 4)
-y <- c(4, 3, 5, 3, 6, 2, 2, 1, 6, 7, 4, 3, 2, 4, 3)
-
-ps(x, y)
-# [1] 0.8844444
-inf.ps.boot(data.frame(y = c(x, y), x = c(rep(1, length(x)), rep(0, length(y)))))
-# [1] 0.7070636 0.9642857
-coef(summary(glm(ps(x, y) ~ 1, binomial, weights = length(x) + length(y))))
-#             Estimate Std. Error  z value    Pr(>|z|)
-# (Intercept) 2.035208  0.5710934 3.563705 0.000365657
-inf.ps.logit(length(x) + length(y), ps(x, y))
-# [1] 0.7142031 0.9590869
-
-rm(x, y)
-gc()
-
 # CRT example ----
 
 dat <- read.csv("ToolsK_archive.csv")
+###### NOTE: For functions to work
 # outcome must be named y
 # grouping variable must be named x and coded 0-1
 # cluster ID must be named ID going from 1 to number of clusters
+# No missing data
 dat
 dat$y <- dat$ap_ws.G1
 table(dat$x <- dat$Condition)
@@ -153,6 +137,7 @@ dat <- na.omit(dat[, c("ID", "x", "y")])
 length(table(dat$ID))
 table(dat$x)
 ps(dat$y[dat$x == 1], dat$y[dat$x == 0])
+# [1] 0.564
 round(inf.ps.pl.mlm(dat), 3)
 # [1] 0.558 0.509 0.605
 # One can only re-create Zou's results if using Walz-z intervals, see ps_functions_new file:
@@ -160,4 +145,22 @@ round(inf.ps.pl.mlm(dat), 3)
 round(inf.ps.logit.crve(dat), 3)
 # [1] 0.555 0.506 0.603
 
+
+# Hypothetical Ruscio example (not in paper) ----
+
+# x <- c(6, 7, 8, 7, 9, 6, 5, 4, 7, 8, 7, 6, 9, 5, 4)
+# y <- c(4, 3, 5, 3, 6, 2, 2, 1, 6, 7, 4, 3, 2, 4, 3)
+# 
+# ps(x, y)
+# # [1] 0.8844444
+# inf.ps.boot(data.frame(y = c(x, y), x = c(rep(1, length(x)), rep(0, length(y)))))
+# # [1] 0.7070636 0.9642857
+# coef(summary(glm(ps(x, y) ~ 1, binomial, weights = length(x) + length(y))))
+# #             Estimate Std. Error  z value    Pr(>|z|)
+# # (Intercept) 2.035208  0.5710934 3.563705 0.000365657
+# inf.ps.logit(length(x) + length(y), ps(x, y))
+# # [1] 0.7142031 0.9590869
+# 
+# rm(x, y)
+# gc()
 
